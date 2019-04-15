@@ -14,3 +14,11 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+//微信
+//Route::any('/weixin/valid','Weixin\WxController@valid');       //首次接入
+Route::get('/weixin/valid','Weixin\WxController@valid');       //首次接入
+Route::post('/weixin/valid','Weixin\WxController@wxEvent');       //接收推送事件
+Route::get('/weixin/token','Weixin\WxController@getAccessToken');       //获取access_token
+
