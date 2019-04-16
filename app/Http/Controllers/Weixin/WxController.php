@@ -85,22 +85,32 @@ class WxController extends Controller
                 $arr = json_decode(file_get_contents($url),true);
                 //echo '<pre>';print_r($arr);echo '</pre>';
 
-                $fl = $arr['HeWeather6'][0]['now']['tmp'];      //摄氏度
-                $wind_dir = $arr['HeWeather6'][0]['now']['wind_dir'];       //风向
-                $wind_sc = $arr['HeWeather6'][0]['now']['wind_sc'];       //风力
-                $hum = $arr['HeWeather6'][0]['now']['hum'];       //湿度
+               // echo '<pre>';print_r($arr);echo '</pre>';die;
+                if($arr['HeWeather6'][0]['status']=='ok'){     //城市名是否正确
+                    $fl = $arr['HeWeather6'][0]['now']['tmp'];      //摄氏度
+                    $wind_dir = $arr['HeWeather6'][0]['now']['wind_dir'];       //风向
+                    $wind_sc = $arr['HeWeather6'][0]['now']['wind_sc'];       //风力
+                    $hum = $arr['HeWeather6'][0]['now']['hum'];       //湿度
+                    $str = "城市：$city \n" ."温度: ".$fl."\n" . "风向：". $wind_dir ."\n" . "风力：".$wind_sc . "\n湿度：".$hum."\n";
 
-                $str = "城市：$city \n" ."温度: ".$fl."\n" . "风向：". $wind_dir ."\n" . "风力：".$wind_sc . "\n湿度：".$hum."\n";
-
-                $response_xml = '<xml>
+                    $response_xml = '<xml>
   <ToUserName><![CDATA['.$open_id.']]></ToUserName>
   <FromUserName><![CDATA['.$app.']]></FromUserName>
   <CreateTime>'.time().'</CreateTime>
   <MsgType><![CDATA[text]]></MsgType>
   <Content><![CDATA['.$str.']]></Content>
 </xml>';
-                echo $response_xml;
+                }else{
+                    $response_xml = '<xml>
+  <ToUserName><![CDATA['.$open_id.']]></ToUserName>
+  <FromUserName><![CDATA['.$app.']]></FromUserName>
+  <CreateTime>'.time().'</CreateTime>
+  <MsgType><![CDATA[text]]></MsgType>
+  <Content><![CDATA[城市名不正确]]></Content>
+</xml>';
+                }
 
+                echo $response_xml;
             }
         }
 
