@@ -90,7 +90,7 @@ class WxController extends Controller
                 $wind_sc = $arr['HeWeather6'][0]['now']['wind_sc'];       //风力
                 $hum = $arr['HeWeather6'][0]['now']['hum'];       //湿度
 
-                $str = "城市：$city \n" ."温度: ".$fl."\n" . "风向：". $wind_dir ."\n" . "风力：".$wind_sc . "湿度：".$hum."\n";
+                $str = "城市：$city \n" ."温度: ".$fl."\n" . "风向：". $wind_dir ."\n" . "风力：".$wind_sc . "\n湿度：".$hum."\n";
 
                 $response_xml = '<xml>
   <ToUserName><![CDATA['.$open_id.']]></ToUserName>
