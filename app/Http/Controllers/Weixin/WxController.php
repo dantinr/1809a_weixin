@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Redis;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 
+use App\Model\WeixinUserModel;
+
 class WxController extends Controller
 {
     //
@@ -139,5 +141,42 @@ class WxController extends Controller
 
         return $token;
 
+    }
+
+    /**
+     * 根据openid消息群发
+     */
+    public function sendMsg($openid_arr,$content)
+    {
+
+        $msg = [
+            "touser"    => $openid_arr,
+            "msgtype"   => "text",
+            "text"  => [
+                "content"   => $content
+            ]
+        ];
+
+        $data = json_encode($msg,JSON_UNESCAPED_UNICODE);
+
+        //openid群发接口
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token='.$this->getAccessToken();
+
+        $client = new Client();
+        $response = $client->request('post',$url,[
+            'body'  => $data
+        ]);
+
+        return $response->getBody();
+    }
+
+    public function send()
+    {
+        $user_list = WeixinUserModel::where(['sub_status'=>1])->get()->toArray();
+        $openid_arr = array_column($user_list,'openid');
+        echo '<pre>';print_r($openid_arr);echo '</pre>';
+        $msg = "今天是周二";
+        $response = $this->sendMsg($openid_arr,$msg);
+        echo $response;
     }
 }
