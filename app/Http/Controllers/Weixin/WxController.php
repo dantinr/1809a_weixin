@@ -40,34 +40,28 @@ class WxController extends Controller
 
 
         $msg_type = $xml_obj->MsgType;          //消息类型
+        $open_id = $xml_obj->FromUserName;      //用户openid
+        $app = $xml_obj->ToUserName;            // 公众号ID
         if($msg_type=='image'){                 //处理图片素材
             $media_id = $xml_obj->MediaId;
-            //获取文件扩展
-            //$url = $xml_obj->PicUrl;            // PicUrl
-            //echo 'Url1: '.$url;echo '</br>';echo '<hr>';
 
             // MediaId URL
-            $url2 = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
-            //echo 'Url2: '. $url2;echo '<hr>';
-            $response = $client->get(new Uri($url2));
-
-
+            $url = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
+            $response = $client->get(new Uri($url));
 
             $headers = $response->getHeaders();     //获取 响应 头信息
-            //echo '<pre>';print_r($headers);echo '</pre>';die;
             $file_info = $headers['Content-disposition'][0];            //获取文件名
 
-            $file_name = rtrim(substr($file_info,-20),'"');
-            //echo 'file_name: '.$file_name;die;
-            $new_file_name = substr(md5(time().mt_rand()),10,8).'_'.$file_name;
+            $file_name =  rtrim(substr($file_info,-20),'"');
+            $new_file_name = 'weixin/' .substr(md5(time().mt_rand()),10,8).'_'.$file_name;
 
             //保存文件
-            $rs = Storage::put($new_file_name, $response->getBody());
-            var_dump($rs);
-
-
-
-
+            $rs = Storage::put($new_file_name, $response->getBody());       //保存文件
+            if($rs){
+                //TODO 保存成功
+            }else{
+                //TODO 保存失败
+            }
 
 
             //var_dump($rs);
@@ -79,6 +73,35 @@ class WxController extends Controller
             $rs = file_put_contents('wx/voice/'.$file_name,$amr);     //保存录音文件
             var_dump($rs);
 
+        }elseif($msg_type=='text'){         //处理文本信息
+
+            //自动回复天气
+            if(strpos($xml_obj->Content,'+天气')){
+                //echo $xml_obj->Content;echo '</br>';
+                //获取城市名
+                $city = explode('+',$xml_obj->Content)[0];
+                //echo 'City: '.$city;
+                $url = 'https://free-api.heweather.net/s6/weather/now?key=HE1904160951011886&location='.$city;
+                $arr = json_decode(file_get_contents($url),true);
+                //echo '<pre>';print_r($arr);echo '</pre>';
+
+                $fl = $arr['HeWeather6'][0]['now']['tmp'];      //摄氏度
+                $wind_dir = $arr['HeWeather6'][0]['now']['wind_dir'];       //风向
+                $wind_sc = $arr['HeWeather6'][0]['now']['wind_sc'];       //风力
+                $hum = $arr['HeWeather6'][0]['now']['hum'];       //湿度
+
+                $str = "温度: ".$fl."\n" . "风向：". $wind_dir ."\n" . "风力：".$wind_sc . "湿度：".$hum."\n";
+
+                $response_xml = '<xml>
+  <ToUserName><![CDATA['.$open_id.']]></ToUserName>
+  <FromUserName><![CDATA['.$app.']]></FromUserName>
+  <CreateTime>'.time().'</CreateTime>
+  <MsgType><![CDATA[text]]></MsgType>
+  <Content><![CDATA['.$str.']]></Content>
+</xml>';
+                echo $response_xml;
+
+            }
         }
 
     }
