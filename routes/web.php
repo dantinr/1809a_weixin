@@ -24,3 +24,10 @@ Route::get('/weixin/token','Weixin\WxController@getAccessToken');       //获取
 
 Route::get('/weixin/send','Weixin\WxController@send');       //消息群发
 
+
+//微信支付
+Route::get('/weixin/pay/test','Weixin\WxPayController@test');           //消息群发
+Route::get('/weixin/pay/notify','Weixin\WxPayController@notify');       //微信支付回调地址
+
+
+
