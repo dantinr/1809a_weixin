@@ -15,6 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/info', function () {
+    phpinfo();
+});
+
 
 //微信
 //Route::any('/weixin/valid','Weixin\WxController@valid');       //首次接入

@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 class WxPayController extends Controller
 {
 
+    public $value = [];
     public $weixin_unifiedorder_url = 'https://api.mch.weixin.qq.com/pay/unifiedorder';        // 统一下单接口
     public $notify_url = 'http://1809abc.comcto.com/weixin/pay/notify';     // 支付回调
 
@@ -22,7 +23,7 @@ class WxPayController extends Controller
         //
         $total_fee = 1;         //用户要支付的总金额
        // $order_id = OrderModel::generateOrderSN();
-        $order_id = time().mt_rand(11111,99999);            //测试订单号 随机生成
+        $order_id = time()  .'_zhangsan_' .mt_rand(11111,99999);  //测试订单号 随机生成
         $order_info = [
             'appid'         =>  env('WEIXIN_APPID_0'),      //微信支付绑定的服务号的APPID
             'mch_id'        =>  env('WEIXIN_MCH_ID'),       // 商户ID
@@ -35,7 +36,6 @@ class WxPayController extends Controller
             'notify_url'    => $this->notify_url,        //通知回调地址
             'trade_type'    => 'NATIVE'                         // 交易类型
         ];
-        $this->values = [];
         $this->values = $order_info;
         $this->SetSign();
         $xml = $this->ToXml();      //将数组转换为XML
